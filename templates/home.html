@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+
+{% block title %}Home | SmartRecipes{% endblock %}
+
+{% block content %}
+<div class="relative w-full h-[90vh] overflow-hidden">
+  <img class="absolute inset-0 w-full h-full object-cover" src="{{ url_for('static', filename='images/land.jpg') }}" alt="SmartRecipes">
+  <div class="relative z-10 flex flex-col items-center justify-center h-full bg-black bg-opacity-40 text-white text-center">
+    <h1 class="text-4xl font-bold mb-4">Welcome to SmartRecipes</h1>
+    <a href="/input" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded text-lg">Explore Recipes</a>
+
+  </div>
+</div>
+{% endblock %}
