@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block title %}Recipes{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6">
+  <h2 class="text-2xl font-bold text-gray-800 mb-4">🍳 Your Recipe Suggestions</h2>
+  
+  <div class="bg-gray-100 p-4 rounded-md whitespace-pre-wrap text-gray-700 leading-relaxed border border-gray-300">
+    {{ recipes }}
+  </div>
+
+  <div class="mt-6 flex justify-between">
+    <a href="/input" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+      🔁 Try Again
+    </a>
+    <a href="/" class="text-gray-600 hover:underline">⬅ Back to Home</a>
+  </div>
+</div>
+{% endblock %}

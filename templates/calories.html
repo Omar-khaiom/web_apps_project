@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block title %}Calories{% endblock %}
+{% block content %}
+
+<div class="max-w-3xl mx-auto bg-white p-6 mt-10 rounded-lg shadow-md">
+  <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">🥗 Nutritional Breakdown</h2>
+
+  {% if breakdown %}
+    <ul class="space-y-3 mb-6">
+      {% set colors = ['bg-green-100', 'bg-yellow-100', 'bg-blue-100', 'bg-pink-100', 'bg-purple-100'] %}
+      {% for ingredient, values in breakdown.items() %}
+        <li class="flex justify-between items-center p-3 rounded {{ colors[loop.index0 % colors|length] }} shadow-sm">
+          <span class="font-medium capitalize text-gray-800">{{ ingredient }}</span>
+          <span class="text-sm text-gray-700">{{ values.kcal }} kcal / {{ values.kj }} kJ</span>
+        </li>
+      {% endfor %}
+    </ul>
+
+    <div class="text-xl font-bold text-green-700 text-center border-t pt-4">
+      Total: {{ total.kcal }} kcal / {{ total.kj }} kJ
+    </div>
+  {% else %}
+    <p class="text-center text-red-600">No matching ingredients found.</p>
+  {% endif %}
+
+  <div class="mt-6 text-center">
+    <a href="/input" class="inline-block bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">
+      🔁 Try Again
+    </a>
+  </div>
+</div>
+
+{% endblock %}
