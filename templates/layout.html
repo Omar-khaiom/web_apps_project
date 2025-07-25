@@ -8,8 +8,16 @@
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
 
+{% if session.get("user") %}
+  <div class="flex items-center gap-2">
+    <img src="{{ url_for('static', filename='avatars/default.png') }}" class="w-8 h-8 rounded-full">
+    <span class="text-sm text-gray-700"> <strong>{{ session['user'] }}</strong></span>
+  </div>
+{% endif %}
+
   <!-- Navbar -->
   <nav class="bg-white shadow-md px-6 py-4 flex justify-between items-center">
+    
     <a href="/" class="text-2xl font-bold text-blue-600">What Can I Cook?</a>
     <div class="space-x-4">
       <a href="/" class="text-gray-700 hover:text-blue-600">Home</a>
@@ -17,6 +25,15 @@
       <a href="/register" class="text-gray-700 hover:text-blue-600">Register</a>
     </div>
   </nav>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="space-y-2 mb-4">
+      {% for category, msg in messages %}
+        <div class="bg-red-100 text-red-800 px-4 py-2 rounded">{{ msg }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
 
   <div class="m-0 p-0">
     {% block content %}{% endblock %}

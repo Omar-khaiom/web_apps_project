@@ -2,23 +2,42 @@
 {% block title %}Input{% endblock %}
 {% block content %}
 
-<h2 class="text-3xl font-bold mb-6 text-center">Enter Your Ingredients</h2>
+<div class="min-h-[70vh] flex flex-col justify-center items-center px-4">
+  <h2 class="text-4xl font-extrabold mb-8 text-center text-gray-800">
+    🍽️ What's in Your Kitchen?
+  </h2>
 
-<form id="inputForm" method="POST" class="max-w-xl mx-auto">
-  <textarea name="ingredients" rows="4" required
-    class="w-full p-4 border rounded shadow focus:outline-none focus:ring-2 focus:ring-blue-500"
-    placeholder="e.g. rice, tomato, egg">{{ request.form.get('ingredients', '') }}</textarea>
+  <form id="inputForm" method="POST" class="w-full max-w-2xl bg-white shadow-lg rounded-xl p-6">
+    <label for="ingredients" class="block text-gray-700 text-sm font-semibold mb-2">
+      List your ingredients (comma-separated):
+    </label>
+    <textarea 
+      name="ingredients" 
+      rows="4" 
+      required
+      class="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+      placeholder="e.g. rice, tomato, egg">{{ request.form.get('ingredients', '') }}</textarea>
 
-  <div class="flex justify-center space-x-4 mt-6">
-    <button type="submit" formaction="/generate" formmethod="POST"
-      class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded shadow">
-      🍳 Generate Recipes
-    </button>
-    <button type="submit" formaction="/calories" formmethod="POST"
-      class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded shadow">
-      🔍 Check Calories
-    </button>
-  </div>
-</form>
+    <div class="flex flex-col sm:flex-row justify-center gap-4 mt-6">
+      <button 
+        type="submit" 
+        formaction="/generate" 
+        formmethod="POST"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg shadow-md transition hover:scale-105"
+      >
+        🍳 Generate Recipes
+      </button>
+
+      <button 
+        type="submit" 
+        formaction="/calories" 
+        formmethod="POST"
+        class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg shadow-md transition hover:scale-105"
+      >
+        🔍 Check Calories
+      </button>
+    </div>
+  </form>
+</div>
 
 {% endblock %}

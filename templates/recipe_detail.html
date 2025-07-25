@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ recipe.title }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans leading-relaxed">
+  <div class="max-w-5xl mx-auto p-4 sm:p-8 space-y-8">
+
+    <!-- Header -->
+    <div class="text-center space-y-3">
+      <h1 class="text-3xl sm:text-4xl font-bold">{{ recipe.title }}</h1>
+      <div class="flex justify-center gap-4 text-sm text-gray-600">
+        {% if recipe.servings %}
+          <span class="bg-white px-3 py-1 rounded shadow">🍽️ Servings: {{ recipe.servings }}</span>
+        {% endif %}
+        {% if recipe.readyInMinutes %}
+          <span class="bg-white px-3 py-1 rounded shadow">⏱️ Ready in: {{ recipe.readyInMinutes }} min</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Image and Ingredients Grid -->
+    <div class="grid md:grid-cols-2 gap-6 items-start">
+      <!-- Recipe Image -->
+      <div class="flex justify-center">
+        <img src="{{ recipe.image }}" alt="{{ recipe.title }}" class="rounded-lg shadow max-w-full md:max-w-md">
+      </div>
+
+      <!-- Ingredients List -->
+      <div class="bg-white rounded-lg shadow p-5">
+        <h2 class="text-xl font-semibold text-green-600 mb-3">🧂 Ingredients</h2>
+        <ul class="list-disc list-inside space-y-1">
+          {% for ing in recipe.ingredients %}
+            <li>
+              {{ ing.text }}
+              {% if ing.aisle %}
+                <span class="text-sm text-gray-500">(Aisle: {{ ing.aisle }})</span>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="bg-white rounded-lg shadow p-5">
+      <h2 class="text-xl font-semibold text-green-600 mb-3">📋 Instructions</h2>
+      {% if recipe.steps %}
+        <ol class="list-decimal list-inside space-y-3">
+          {% for step in recipe.steps %}
+            <li class="bg-gray-50 px-4 py-2 rounded">{{ step }}</li>
+          {% endfor %}
+        </ol>
+      {% elif recipe.instructions %}
+        <div class="whitespace-pre-line">{{ recipe.instructions | safe }}</div>
+      {% else %}
+        <p class="italic text-gray-500">No instructions available.</p>
+      {% endif %}
+    </div>
+
+    <!-- Nutrition Section -->
+    {% if recipe.nutrition %}
+      <div class="bg-white rounded-lg shadow p-5">
+        <h2 class="text-xl font-semibold text-green-600 mb-3">🍎 Nutrition Facts</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          {% for n in recipe.nutrition[:9] %}
+            <div class="bg-gray-50 rounded p-3 shadow-sm">
+              <div class="text-gray-700 font-medium">{{ n.name }}</div>
+              <div class="text-green-700 text-lg font-bold">{{ n.amount }} {{ n.unit }}</div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Back to Home -->
+    <div class="text-center">
+      <a href="{{ url_for('home') }}" class="inline-block mt-4 bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded shadow transition">
+        ← Back to Home
+      </a>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,19 +1,41 @@
-{% extends "layout.html" %}
-{% block title %}Recipes{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Recipes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold mb-8 text-center">Suggested Recipes</h1>
 
-{% block content %}
-<div class="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6">
-  <h2 class="text-2xl font-bold text-gray-800 mb-4">🍳 Your Recipe Suggestions</h2>
-  
-  <div class="bg-gray-100 p-4 rounded-md whitespace-pre-wrap text-gray-700 leading-relaxed border border-gray-300">
-    {{ recipes }}
-  </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for recipe in recipes %}
+            <div class="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-xl transition duration-300">
+                <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}">
+                    <img src="{{ recipe.image }}" alt="{{ recipe.title }}" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h2 class="text-xl font-semibold text-gray-900 hover:text-blue-600">{{ recipe.title }}</h2>
+                    </div>
+                </a>
+                <div class="px-4 pb-4 text-sm text-gray-700">
+                    <strong class="block font-medium text-gray-800 mt-2">Used Ingredients:</strong>
+                    <ul class="list-disc list-inside mb-2">
+                        {% for ingredient in recipe.used %}
+                        <li>{{ ingredient }}</li>
+                        {% endfor %}
+                    </ul>
 
-  <div class="mt-6 flex justify-between">
-    <a href="/input" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
-      🔁 Try Again
-    </a>
-    <a href="/" class="text-gray-600 hover:underline">⬅ Back to Home</a>
-  </div>
-</div>
-{% endblock %}
+                    <strong class="block font-medium text-gray-800">Missing Ingredients:</strong>
+                    <ul class="list-disc list-inside">
+                        {% for ingredient in recipe.missed %}
+                        <li>{{ ingredient }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
