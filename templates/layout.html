@@ -8,28 +8,38 @@
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
 
-{% if session.get("user") %}
-  <div class="flex items-center gap-2">
-    <img src="{{ url_for('static', filename='avatars/default.png') }}" class="w-8 h-8 rounded-full">
-    <span class="text-sm text-gray-700"> <strong>{{ session['user'] }}</strong></span>
-  </div>
-{% endif %}
-
   <!-- Navbar -->
   <nav class="bg-white shadow-md px-6 py-4 flex justify-between items-center">
     
     <a href="/" class="text-2xl font-bold text-blue-600">What Can I Cook?</a>
     <div class="space-x-4">
       <a href="/" class="text-gray-700 hover:text-blue-600">Home</a>
-      <a href="/login" class="text-gray-700 hover:text-blue-600">Login</a>
-      <a href="/register" class="text-gray-700 hover:text-blue-600">Register</a>
+      
+      <!-- FIX: Proper login/logout navigation -->
+      {% if session.get("user") %}
+        <span class="text-sm text-gray-700">Welcome, <strong>{{ session['user'] }}</strong></span>
+        <a href="/logout" class="text-gray-700 hover:text-blue-600">Logout</a>
+      {% else %}
+        <a href="/login" class="text-gray-700 hover:text-blue-600">Login</a>
+        <a href="/register" class="text-gray-700 hover:text-blue-600">Register</a>
+      {% endif %}
     </div>
   </nav>
+
+<!-- FIX: Better flash message styling with color coding -->
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
-    <div class="space-y-2 mb-4">
+    <div class="space-y-2 mb-4 px-6 pt-4">
       {% for category, msg in messages %}
-        <div class="bg-red-100 text-red-800 px-4 py-2 rounded">{{ msg }}</div>
+        {% if category == 'success' %}
+          <div class="bg-green-100 border border-green-400 text-green-800 px-4 py-2 rounded">{{ msg }}</div>
+        {% elif category == 'danger' %}
+          <div class="bg-red-100 border border-red-400 text-red-800 px-4 py-2 rounded">{{ msg }}</div>
+        {% elif category == 'warning' %}
+          <div class="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-2 rounded">{{ msg }}</div>
+        {% else %}
+          <div class="bg-blue-100 border border-blue-400 text-blue-800 px-4 py-2 rounded">{{ msg }}</div>
+        {% endif %}
       {% endfor %}
     </div>
   {% endif %}
