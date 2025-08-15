@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    
+    <!-- Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; media-src *; img-src * data: content:;">
+    
+    <title>SmartRecipes</title>
+    
+    <!-- App icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="static/icons/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="static/icons/icon-192x192.png">
+    <link rel="apple-touch-icon" href="static/icons/icon-192x192.png">
+    
+    <!-- Styling -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .splash-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .app-icon {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 20px;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .app-title {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .app-tagline {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 40px;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        .connection-status {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.2);
+            font-size: 14px;
+        }
+
+        .webview-container {
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+
+        .webview-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: rgba(255, 59, 48, 0.9);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px;
+            text-align: center;
+        }
+
+        .retry-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.5);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .retry-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div id="splash" class="splash-screen">
+        <img src="static/icons/icon-512x512.png" alt="SmartRecipes" class="app-icon" onerror="this.style.display='none'">
+        <h1 class="app-title">SmartRecipes</h1>
+        <p class="app-tagline">Smart cooking made easy</p>
+        <div class="loading-spinner"></div>
+        <div id="status" class="connection-status">Connecting to server...</div>
+        <button id="retryBtn" class="retry-btn" style="display: none;" onclick="initializeApp()">Retry Connection</button>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="webview" class="webview-container">
+        <iframe id="appFrame" src="" allowfullscreen></iframe>
+    </div>
+
+    <!-- Cordova Script -->
+    <script type="text/javascript" src="cordova.js"></script>
+
+    <script>
+        class SmartRecipesApp {
+            constructor() {
+                this.serverUrls = [
+                    'http://localhost:5000',
+                    'http://127.0.0.1:5000',
+                    'http://192.168.1.100:5000', // Replace with your actual local IP
+                    'https://your-deployed-app.herokuapp.com' // Replace with your deployed URL
+                ];
+                this.currentUrlIndex = 0;
+                this.maxRetries = 3;
+                this.retryCount = 0;
+                this.connectionTimeout = 10000; // 10 seconds
+                
+                this.elements = {
+                    splash: document.getElementById('splash'),
+                    webview: document.getElementById('webview'),
+                    appFrame: document.getElementById('appFrame'),
+                    status: document.getElementById('status'),
+                    retryBtn: document.getElementById('retryBtn')
+                };
+
+                this.initializeApp();
+            }
+
+            updateStatus(message, isError = false) {
+                this.elements.status.textContent = message;
+                if (isError) {
+                    this.elements.status.style.background = 'rgba(255, 59, 48, 0.9)';
+                    this.elements.retryBtn.style.display = 'block';
+                } else {
+                    this.elements.status.style.background = 'rgba(255,255,255,0.2)';
+                    this.elements.retryBtn.style.display = 'none';
+                }
+            }
+
+            async checkConnection(url) {
+                return new Promise((resolve) => {
+                    const timeout = setTimeout(() => resolve(false), this.connectionTimeout);
+                    
+                    // Try to load a simple endpoint to test connectivity
+                    const testUrl = url + '/';
+                    const img = new Image();
+                    
+                    img.onload = () => {
+                        clearTimeout(timeout);
+                        resolve(true);
+                    };
+                    
+                    img.onerror = () => {
+                        clearTimeout(timeout);
+                        
+                        // Fallback: try fetch if image fails
+                        fetch(testUrl, { 
+                            method: 'GET',
+                            mode: 'no-cors',
+                            timeout: this.connectionTimeout 
+                        })
+                        .then(() => resolve(true))
+                        .catch(() => resolve(false));
+                    };
+                    
+                    // Use a small icon as test
+                    img.src = url + '/static/icons/icon-72x72.png?t=' + Date.now();
+                });
+            }
+
+            async findWorkingServer() {
+                this.updateStatus('Searching for server...');
+
+                for (let i = 0; i < this.serverUrls.length; i++) {
+                    const url = this.serverUrls[i];
+                    this.updateStatus(`Trying ${url}...`);
+                    
+                    const isWorking = await this.checkConnection(url);
+                    if (isWorking) {
+                        this.updateStatus('Connected! Loading app...');
+                        return url;
+                    }
+                }
+
+                return null;
+            }
+
+            async loadApp(serverUrl) {
+                try {
+                    // Set iframe source
+                    this.elements.appFrame.src = serverUrl;
+                    
+                    // Wait for iframe to load
+                    await new Promise((resolve, reject) => {
+                        const timeout = setTimeout(() => reject(new Error('Load timeout')), 15000);
+                        
+                        this.elements.appFrame.onload = () => {
+                            clearTimeout(timeout);
+                            resolve();
+                        };
+                        
+                        this.elements.appFrame.onerror = () => {
+                            clearTimeout(timeout);
+                            reject(new Error('Failed to load'));
+                        };
+                    });
+
+                    // Hide splash screen and show app
+                    setTimeout(() => {
+                        this.elements.splash.style.display = 'none';
+                        this.elements.webview.style.display = 'block';
+                    }, 1000);
+
+                    return true;
+                } catch (error) {
+                    console.error('Failed to load app:', error);
+                    return false;
+                }
+            }
+
+            async initializeApp() {
+                this.retryCount++;
+                this.updateStatus('Starting SmartRecipes...');
+
+                try {
+                    const serverUrl = await this.findWorkingServer();
+                    
+                    if (serverUrl) {
+                        const loaded = await this.loadApp(serverUrl);
+                        if (loaded) return; // Success!
+                    }
+
+                    throw new Error('No working server found');
+
+                } catch (error) {
+                    console.error('App initialization failed:', error);
+                    
+                    if (this.retryCount < this.maxRetries) {
+                        this.updateStatus(`Connection failed. Retrying... (${this.retryCount}/${this.maxRetries})`, true);
+                        setTimeout(() => this.initializeApp(), 3000);
+                    } else {
+                        this.updateStatus('Unable to connect to SmartRecipes server. Please check your internet connection and make sure the server is running.', true);
+                    }
+                }
+            }
+
+            // Handle device back button
+            handleBackButton() {
+                const iframe = this.elements.appFrame;
+                if (iframe.style.display !== 'none') {
+                    // Try to go back in the iframe
+                    try {
+                        iframe.contentWindow.history.back();
+                    } catch (e) {
+                        // If can't access iframe history, ask user to confirm exit
+                        if (confirm('Exit SmartRecipes?')) {
+                            navigator.app.exitApp();
+                        }
+                    }
+                }
+            }
+        }
+
+        // Initialize when device is ready
+        let app;
+
+        function onDeviceReady() {
+            console.log('Device ready');
+            
+            // Initialize app
+            app = new SmartRecipesApp();
+            
+            // Handle back button
+            document.addEventListener('backbutton', () => app.handleBackButton(), false);
+            
+            // Handle network events
+            document.addEventListener('offline', () => {
+                console.log('Network offline');
+                app.updateStatus('No internet connection', true);
+            }, false);
+            
+            document.addEventListener('online', () => {
+                console.log('Network online');
+                app.updateStatus('Internet connected');
+                setTimeout(() => app.initializeApp(), 1000);
+            }, false);
+        }
+
+        function onLoad() {
+            document.addEventListener('deviceready', onDeviceReady, false);
+            
+            // Fallback for web browser testing
+            setTimeout(() => {
+                if (!window.cordova) {
+                    console.log('Running in browser mode');
+                    onDeviceReady();
+                }
+            }, 1000);
+        }
+
+        // Global retry function
+        function initializeApp() {
+            if (app) {
+                app.retryCount = 0;
+                app.initializeApp();
+            }
+        }
+
+        // Start the app
+        document.addEventListener('DOMContentLoaded', onLoad, false);
+    </script>
+</body>
+</html>

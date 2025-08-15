@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.smartrecipes.app" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>SmartRecipes</name>
+    <description>
+        Find and create delicious recipes with ingredients you have at home. Smart cooking made easy!
+    </description>
+    <author email="contact@smartrecipes.app" href="https://smartrecipes.app">
+        SmartRecipes Team
+    </author>
+    
+    <!-- Main entry point -->
+    <content src="index.html" />
+    
+    <!-- Allow navigation to external URLs -->
+    <allow-navigation href="*" />
+    <allow-intent href="*" />
+    
+    <!-- Allow access to all network requests -->
+    <access origin="*" />
+    
+    <!-- Preferences -->
+    <preference name="DisallowOverscroll" value="true" />
+    <preference name="android-minSdkVersion" value="24" />
+    <preference name="android-targetSdkVersion" value="33" />
+    <preference name="BackupWebStorage" value="local" />
+    <preference name="SplashScreenDelay" value="2000" />
+    <preference name="FadeSplashScreenDuration" value="300" />
+    <preference name="AutoHideSplashScreen" value="true" />
+    <preference name="ShowSplashScreenSpinner" value="false" />
+    <preference name="orientation" value="portrait" />
+    
+    <!-- Android specific preferences -->
+    <platform name="android">
+        <preference name="android-windowSoftInputMode" value="adjustResize" />
+        <preference name="Fullscreen" value="false" />
+        <preference name="KeepRunning" value="true" />
+        
+        <!-- Icons -->
+        <icon src="static/icons/icon-72x72.png" density="ldpi" />
+        <icon src="static/icons/icon-96x96.png" density="mdpi" />
+        <icon src="static/icons/icon-144x144.png" density="hdpi" />
+        <icon src="static/icons/icon-192x192.png" density="xhdpi" />
+        <icon src="static/icons/icon-192x192.png" density="xxhdpi" />
+        <icon src="static/icons/icon-384x384.png" density="xxxhdpi" />
+        
+        <!-- Splash screens -->
+        <splash src="static/icons/icon-512x512.png" density="land-ldpi" />
+        <splash src="static/icons/icon-512x512.png" density="land-mdpi" />
+        <splash src="static/icons/icon-512x512.png" density="land-hdpi" />
+        <splash src="static/icons/icon-512x512.png" density="land-xhdpi" />
+        
+        <!-- Permissions -->
+        <uses-permission android:name="android.permission.INTERNET" />
+        <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+        <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+        <uses-permission android:name="android.permission.CAMERA" />
+        <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    </platform>
+    
+    <!-- Plugins -->
+    <plugin name="cordova-plugin-whitelist" spec="^1.3.4" />
+    <plugin name="cordova-plugin-splashscreen" spec="^6.0.0" />
+    <plugin name="cordova-plugin-device" spec="^2.0.3" />
+    <plugin name="cordova-plugin-network-information" spec="^3.0.0" />
+    <plugin name="cordova-plugin-inappbrowser" spec="^5.0.0" />
+</widget>

@@ -1,43 +1,379 @@
 {% extends "layout.html" %}
-{% block title %}Input{% endblock %}
+
+{% block title %}Find Recipes | SmartRecipes{% endblock %}
+
 {% block content %}
+<!-- Hero Section with Background -->
+<section class="relative min-h-screen flex items-center justify-center overflow-hidden">
+  <!-- Background Image with Overlay -->
+  <div class="absolute inset-0 z-0">
+    <img class="w-full h-full object-cover" src="{{ url_for('static', filename='images/kitchen-bg.jpg') }}" alt="Kitchen Background">
+    <div class="absolute inset-0 bg-gradient-to-br from-primary-900/80 via-orange-900/70 to-yellow-900/60"></div>
+  </div>
+  
+  <!-- Floating Elements -->
+  <div class="absolute inset-0 z-10 pointer-events-none">
+    <div class="float absolute top-20 left-10 w-16 h-16 bg-primary-500/20 rounded-full blur-xl"></div>
+    <div class="float absolute top-40 right-20 w-24 h-24 bg-orange-500/20 rounded-full blur-xl" style="animation-delay: 2s;"></div>
+    <div class="float absolute bottom-32 left-1/4 w-20 h-20 bg-yellow-500/20 rounded-full blur-xl" style="animation-delay: 4s;"></div>
+    <div class="float absolute top-60 right-1/3 w-12 h-12 bg-secondary-500/20 rounded-full blur-xl" style="animation-delay: 1s;"></div>
+  </div>
 
-<div class="min-h-[70vh] flex flex-col justify-center items-center px-4">
-  <h2 class="text-4xl font-extrabold mb-8 text-center text-gray-800">
-    🍽️ What's in Your Kitchen?
-  </h2>
-
-  <form id="inputForm" method="POST" class="w-full max-w-2xl bg-white shadow-lg rounded-xl p-6">
-    <label for="ingredients" class="block text-gray-700 text-sm font-semibold mb-2">
-      List your ingredients (comma-separated):
-    </label>
-    <textarea 
-      name="ingredients" 
-      rows="4" 
-      required
-      class="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-      placeholder="e.g. rice, tomato, egg">{{ request.form.get('ingredients', '') }}</textarea>
-
-    <div class="flex flex-col sm:flex-row justify-center gap-4 mt-6">
-      <button 
-        type="submit" 
-        formaction="/generate" 
-        formmethod="POST"
-        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg shadow-md transition hover:scale-105"
-      >
-        🍳 Generate Recipes
-      </button>
-
-      <button 
-        type="submit" 
-        formaction="/calories" 
-        formmethod="POST"
-        class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg shadow-md transition hover:scale-105"
-      >
-        🔍 Check Calories
-      </button>
+  <!-- Main Content Container -->
+  <div class="relative z-20 w-full max-w-4xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="text-center mb-8 animate-fade-in-up">
+      <h1 class="text-4xl md:text-6xl font-heading font-bold text-white leading-tight mb-4">
+        Find Your Perfect
+        <span class="block gradient-text bg-gradient-to-r from-primary-400 via-orange-400 to-yellow-400 bg-clip-text text-transparent">
+          Recipe
+        </span>
+      </h1>
+      <p class="text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed">
+        Enter ingredients you have and discover amazing recipes tailored just for you
+      </p>
     </div>
-  </form>
-</div>
 
+    <!-- Main Search Form -->
+    <div class="glass rounded-3xl p-8 mb-8 animate-fade-in-up" style="animation-delay: 0.2s;">
+      <form method="POST" action="{{ url_for('generate') }}" id="recipe-form" class="space-y-8">
+        <!-- Ingredients Input -->
+        <div class="space-y-4">
+          <label for="ingredients" class="block text-xl font-semibold text-white mb-4 flex items-center">
+            <div class="w-10 h-10 bg-gradient-to-r from-primary-500 to-orange-400 rounded-full flex items-center justify-center mr-3">
+              <i class="fas fa-utensils text-white text-lg"></i>
+            </div>
+            What ingredients do you have?
+          </label>
+          <div class="relative">
+            <input 
+              type="text" 
+              name="ingredients" 
+              id="ingredients"
+              class="w-full px-6 py-4 bg-white/10 backdrop-blur-md border-2 border-white/20 rounded-2xl focus:border-primary-400 focus:outline-none text-lg text-white placeholder-gray-300 transition-all duration-300"
+              placeholder="e.g., chicken, rice, onions, garlic"
+              required
+            >
+            <div class="absolute inset-0 bg-gradient-to-r from-primary-500/10 to-orange-500/10 rounded-2xl pointer-events-none opacity-0 transition-opacity duration-300" id="input-glow"></div>
+          </div>
+          <p class="text-sm text-gray-300 flex items-center">
+            <i class="fas fa-info-circle mr-2"></i>
+            Separate ingredients with commas for best results
+          </p>
+        </div>
+
+        <!-- Dietary Filters -->
+        <div class="space-y-6">
+          <h3 class="text-xl font-semibold text-white mb-6 flex items-center">
+            <div class="w-10 h-10 bg-gradient-to-r from-secondary-500 to-teal-400 rounded-full flex items-center justify-center mr-3">
+              <i class="fas fa-leaf text-white text-lg"></i>
+            </div>
+            Dietary Preferences
+          </h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <label class="dietary-option group cursor-pointer">
+              <input type="checkbox" name="diet" value="vegetarian" class="hidden">
+              <div class="glass-card rounded-xl p-4 text-center hover:scale-105 transition-all duration-300 border-2 border-transparent">
+                <div class="text-3xl mb-2 group-hover:animate-bounce-gentle">🥬</div>
+                <span class="text-white font-medium">Vegetarian</span>
+              </div>
+            </label>
+            
+            <label class="dietary-option group cursor-pointer">
+              <input type="checkbox" name="diet" value="vegan" class="hidden">
+              <div class="glass-card rounded-xl p-4 text-center hover:scale-105 transition-all duration-300 border-2 border-transparent">
+                <div class="text-3xl mb-2 group-hover:animate-bounce-gentle">🌱</div>
+                <span class="text-white font-medium">Vegan</span>
+              </div>
+            </label>
+            
+            <label class="dietary-option group cursor-pointer">
+              <input type="checkbox" name="diet" value="gluten free" class="hidden">
+              <div class="glass-card rounded-xl p-4 text-center hover:scale-105 transition-all duration-300 border-2 border-transparent">
+                <div class="text-3xl mb-2 group-hover:animate-bounce-gentle">🌾</div>
+                <span class="text-white font-medium">Gluten Free</span>
+              </div>
+            </label>
+            
+            <label class="dietary-option group cursor-pointer">
+              <input type="checkbox" name="diet" value="dairy free" class="hidden">
+              <div class="glass-card rounded-xl p-4 text-center hover:scale-105 transition-all duration-300 border-2 border-transparent">
+                <div class="text-3xl mb-2 group-hover:animate-bounce-gentle">🥛</div>
+                <span class="text-white font-medium">Dairy Free</span>
+              </div>
+            </label>
+            
+            <label class="dietary-option group cursor-pointer">
+              <input type="checkbox" name="diet" value="keto" class="hidden">
+              <div class="glass-card rounded-xl p-4 text-center hover:scale-105 transition-all duration-300 border-2 border-transparent">
+                <div class="text-3xl mb-2 group-hover:animate-bounce-gentle">🥑</div>
+                <span class="text-white font-medium">Keto</span>
+              </div>
+            </label>
+            
+            <label class="dietary-option group cursor-pointer">
+              <input type="checkbox" name="diet" value="paleo" class="hidden">
+              <div class="glass-card rounded-xl p-4 text-center hover:scale-105 transition-all duration-300 border-2 border-transparent">
+                <div class="text-3xl mb-2 group-hover:animate-bounce-gentle">🥩</div>
+                <span class="text-white font-medium">Paleo</span>
+              </div>
+            </label>
+            
+            <label class="dietary-option group cursor-pointer">
+              <input type="checkbox" name="diet" value="low carb" class="hidden">
+              <div class="glass-card rounded-xl p-4 text-center hover:scale-105 transition-all duration-300 border-2 border-transparent">
+                <div class="text-3xl mb-2 group-hover:animate-bounce-gentle">🥒</div>
+                <span class="text-white font-medium">Low Carb</span>
+              </div>
+            </label>
+            
+            <label class="dietary-option group cursor-pointer">
+              <input type="checkbox" name="diet" value="whole30" class="hidden">
+              <div class="glass-card rounded-xl p-4 text-center hover:scale-105 transition-all duration-300 border-2 border-transparent">
+                <div class="text-3xl mb-2 group-hover:animate-bounce-gentle">💪</div>
+                <span class="text-white font-medium">Whole30</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-6 pt-6">
+          <button 
+            type="submit" 
+            id="search-btn"
+            class="group flex-1 bg-gradient-to-r from-primary-500 to-orange-400 hover:from-primary-600 hover:to-orange-500 text-white font-bold py-4 px-8 rounded-2xl transition-all duration-300 btn-hover-lift flex items-center justify-center space-x-3 text-lg"
+          >
+            <i class="fas fa-search group-hover:animate-bounce-gentle"></i>
+            <span>Find My Recipes</span>
+            <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+          </button>
+          
+        </div>
+      </form>
+    </div>
+
+    <!-- Search History -->
+    {% if session.get('search_history') %}
+    <div class="glass rounded-2xl p-6 mb-8 animate-fade-in-up" style="animation-delay: 0.4s;">
+      <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+        <i class="fas fa-history mr-3 text-primary-400"></i>
+        Recent Searches
+      </h3>
+      <div class="flex flex-wrap gap-3">
+        {% for search in session.search_history %}
+        <button 
+          onclick="document.getElementById('ingredients').value='{{ search }}'; document.getElementById('ingredients').focus();"
+          class="group px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-gray-200 rounded-full text-sm transition-all duration-300 hover:bg-white/20 hover:border-primary-400 hover:text-white"
+        >
+          <i class="fas fa-clock mr-1 opacity-60 group-hover:opacity-100"></i>
+          {{ search }}
+        </button>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Quick Navigation -->
+    <div class="text-center mt-8 animate-fade-in-up" style="animation-delay: 0.6s;">
+      <div class="flex flex-col sm:flex-row justify-center items-center gap-6">
+        <a href="{{ url_for('home') }}" class="group text-gray-300 hover:text-white font-medium transition-colors duration-300 flex items-center">
+          <i class="fas fa-arrow-left mr-2 group-hover:-translate-x-1 transition-transform"></i>
+          Back to Home
+        </a>
+        {% if session.get('user') %}
+        <span class="text-gray-500">•</span>
+        <a href="{{ url_for('favorites') }}" class="group text-gray-300 hover:text-white font-medium transition-colors duration-300 flex items-center">
+          <i class="fas fa-heart mr-2 text-red-400 group-hover:animate-pulse"></i>
+          My Favorites
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+/* Additional CSS for enhanced effects */
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33% { transform: translateY(-20px) rotate(2deg); }
+  66% { transform: translateY(-10px) rotate(-1deg); }
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+.gradient-text {
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-bounce-gentle {
+  animation: bounceGentle 0.6s ease-in-out;
+}
+
+@keyframes bounceGentle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* Dietary option interactions */
+.dietary-option input:checked + .glass-card {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(249, 115, 22, 0.6);
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.3);
+  transform: scale(1.05);
+}
+
+/* Input focus effects */
+#ingredients:focus {
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+}
+
+#ingredients:focus + #input-glow {
+  opacity: 1;
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(249, 115, 22, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(249, 115, 22, 0.7);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Enhanced form submission with loading animation and search storage
+  document.getElementById('recipe-form').addEventListener('submit', function(e) {
+    // Store search info for pagination
+    const ingredientsInput = document.getElementById('ingredients');
+    const ingredients = ingredientsInput.value.trim();
+    const selectedDiets = Array.from(document.querySelectorAll('input[name="diet"]:checked')).map(cb => cb.value);
+    
+    sessionStorage.setItem('lastSearchIngredients', ingredients);
+    sessionStorage.setItem('lastSearchDiet', selectedDiets.join(','));
+    
+    const btn = document.getElementById('search-btn');
+    const originalContent = btn.innerHTML;
+    
+    btn.innerHTML = `
+      <div class="flex items-center space-x-3">
+        <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+        <span>Finding Recipes...</span>
+      </div>
+    `;
+    btn.disabled = true;
+    btn.classList.add('opacity-75');
+    
+    // Re-enable after 30 seconds as fallback
+    setTimeout(() => {
+      btn.innerHTML = originalContent;
+      btn.disabled = false;
+      btn.classList.remove('opacity-75');
+    }, 30000);
+  });
+
+  // Enhanced dietary option interactions
+  document.querySelectorAll('.dietary-option').forEach(option => {
+    const checkbox = option.querySelector('input[type="checkbox"]');
+    const card = option.querySelector('.glass-card');
+    
+    option.addEventListener('click', function() {
+      checkbox.checked = !checkbox.checked;
+      
+      if (checkbox.checked) {
+        card.classList.add('selected');
+        // Add selected animation
+        card.style.animation = 'none';
+        setTimeout(() => {
+          card.style.animation = 'pulse 0.5s ease-in-out';
+        }, 10);
+      } else {
+        card.classList.remove('selected');
+      }
+    });
+  });
+
+  // Auto-suggestions enhancement (if you want to add this feature later)
+  const ingredientsInput = document.getElementById('ingredients');
+  let suggestionTimeout;
+  
+  ingredientsInput.addEventListener('input', function() {
+    clearTimeout(suggestionTimeout);
+    const value = this.value.trim();
+    
+    if (value.length > 2) {
+      suggestionTimeout = setTimeout(() => {
+        // Here you could add API call for ingredient suggestions
+        console.log('Could suggest ingredients for:', value);
+      }, 500);
+    }
+  });
+
+  // Add floating animation delays randomly
+  document.querySelectorAll('.float').forEach((element, index) => {
+    element.style.animationDelay = `${Math.random() * 2}s`;
+  });
+
+  // Parallax effect for background
+  window.addEventListener('scroll', () => {
+    const scrolled = window.pageYOffset;
+    const parallax = document.querySelector('.absolute.inset-0.z-0 img');
+    if (parallax) {
+      parallax.style.transform = `translateY(${scrolled * 0.5}px)`;
+    }
+  });
+});
+</script>
 {% endblock %}
