@@ -1,0 +1,24 @@
+🍽️ SmartRecipes Android App - Ready to Install!
+
+📱 APK FILE: SmartRecipes-v1.0-debug.apk (29.98 MB)
+
+🚀 QUICK INSTALL (Android users):
+1. Enable "Install from Unknown Sources" in Settings > Security
+2. Download and tap the APK file
+3. Tap "Install" and wait for completion
+4. Open SmartRecipes app and enjoy!
+
+⚠️ IMPORTANT:
+- Requires Android 7.0 or higher
+- Needs internet connection to work
+- Safe to install (debug certificate, no malware)
+
+🔧 IF ISSUES:
+- Make sure you have 50MB+ free space
+- Check internet connection
+- Try restarting device after install
+
+📧 FEEDBACK WELCOME!
+Let me know how the app works on your device and any suggestions!
+
+Built with ❤️ by SmartRecipes Team
