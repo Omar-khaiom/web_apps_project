@@ -204,18 +204,7 @@
                     <!-- Gradient overlay -->
                     <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     
-                    <!-- Enhanced Favorite Button -->
-                    {% if session.get('user') %}
-                    <button 
-                        onclick="toggleFavorite({{ recipe.id }}, '{{ recipe.title }}', '{{ recipe.image }}')"
-                        id="fav-btn-{{ recipe.id }}"
-                        class="absolute top-4 right-4 w-12 h-12 glass hover:bg-white/90 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 shadow-lg print:hidden group"
-                    >
-                        <span id="fav-icon-{{ recipe.id }}" class="text-2xl transition-transform duration-300 group-hover:scale-125">
-                            {% if recipe.id in user_favorites %}❤️{% else %}🤍{% endif %}
-                        </span>
-                    </button>
-                    {% endif %}
+                    
                     
                     <!-- Quick info badges -->
                     <div class="absolute bottom-4 left-4 flex space-x-2">
@@ -353,13 +342,7 @@
                     <span>Search More Recipes</span>
                 </a>
                 
-                {% if session.get('user') %}
-                <a href="{{ url_for('favorites') }}" 
-                   class="group bg-gradient-to-r from-red-500 to-pink-500 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex items-center justify-center space-x-2">
-                    <i class="fas fa-heart group-hover:animate-pulse"></i>
-                    <span>View Favorites</span>
-                </a>
-                {% endif %}
+                
                 
                 <button onclick="window.print()" 
                         class="group bg-gradient-to-r from-gray-600 to-gray-700 text-white font-bold py-4 px-8 rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex items-center justify-center space-x-2">
@@ -451,47 +434,7 @@
             cards.forEach(card => grid.appendChild(card));
         }
 
-        // Enhanced favorite toggle with better animations
-        async function toggleFavorite(recipeId, recipeTitle, recipeImage) {
-            const button = document.getElementById(`fav-btn-${recipeId}`);
-            const icon = document.getElementById(`fav-icon-${recipeId}`);
-            
-            // Add loading state
-            button.style.transform = 'scale(0.9)';
-            
-            try {
-                const response = await fetch('/toggle-favorite', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        recipe_id: recipeId,
-                        recipe_title: recipeTitle,
-                        recipe_image: recipeImage
-                    })
-                });
-                
-                const data = await response.json();
-                
-                // Animate the change
-                icon.style.transform = 'scale(1.5)';
-                setTimeout(() => {
-                    icon.textContent = data.favorited ? '❤️' : '🤍';
-                    icon.style.transform = 'scale(1)';
-                }, 150);
-                
-                // Show enhanced notification
-                showToast(
-                    data.favorited ? 'Added to favorites! ❤️' : 'Removed from favorites',
-                    data.favorited ? 'success' : 'info'
-                );
-                
-            } catch (error) {
-                console.error('Error toggling favorite:', error);
-                showToast('Error updating favorites', 'error');
-            } finally {
-                button.style.transform = 'scale(1)';
-            }
-        }
+        
 
         // Enhanced toast notifications
         function showToast(message, type = 'info') {
