@@ -4,6 +4,7 @@ from flask_limiter.util import get_remote_address
 from flask_caching import Cache
 from dotenv import load_dotenv
 import os
+import math
 import requests
 import re
 import logging
@@ -281,12 +282,12 @@ def generate():
         session['search_history'].insert(0, search_term)
         session['search_history'] = session['search_history'][:5]
     
-    # Store current search parameters for pagination
+    # Store current search parameters for pagination (total_pages updated after API call)
     session['current_search'] = {
         'ingredients': ingredients,
         'dietary_prefs': dietary_prefs,
         'current_page': page,
-        'total_pages': 10  # Assume max 10 pages for now
+        'total_pages': 1
     }
 
     api_key = os.getenv("SPOONACULAR_API_KEY")
@@ -327,6 +328,10 @@ def generate():
             return redirect(url_for("input_page"))
 
         results = payload.get("results", [])
+        # Update total pages from API totalResults if available
+        total_results = payload.get("totalResults") or 0
+        total_pages = max(1, math.ceil(total_results / RECIPES_PER_PAGE)) if total_results else 1
+        session['current_search']['total_pages'] = total_pages
         app.logger.info(f"Retrieved {len(results)} recipes from complexSearch")
 
         # Build recipe cards; still call details (cached) for consistency & robustness
@@ -480,7 +485,12 @@ def generate():
             recipes.append(recipe)
 
         app.logger.info(f"Successfully processed {len(recipes)} recipes (server-side filtered)")
-        return render_template("result.html", recipes=recipes, current_page=page, total_pages=session['current_search']['total_pages'])
+        
+        # Store recipes in session for GET redirect
+        session['current_recipes'] = recipes
+        
+        # Redirect to GET route to prevent resubmission on back navigation
+        return redirect(url_for("results", page=page))
 
     except requests.exceptions.Timeout:
         app.logger.error("API request timeout")
@@ -495,15 +505,29 @@ def generate():
         flash("An unexpected error occurred. Please try again.", "danger")
         return redirect(url_for("input_page"))
 
-@app.route("/test-icons")
-def test_icons():
-    """Test page to check if Font Awesome icons are loading properly"""
-    return render_template("test_icons.html")
+@app.route("/results")
+def results():
+    """GET route for results to prevent resubmission on back navigation"""
+    page = int(request.args.get("page", 1))
+    
+    # Get recipes and search info from session
+    recipes = session.get('current_recipes', [])
+    current_search = session.get('current_search', {})
+    
+    if not recipes or not current_search:
+        flash("No search results found. Please search for recipes first.", "warning")
+        return redirect(url_for("input_page"))
+    
+    total_pages = current_search.get('total_pages', 1)
+    
+    return render_template("result.html", recipes=recipes, current_page=page, total_pages=total_pages)
+
+
 
 @app.route("/load-more-recipes", methods=["POST"])
 @limiter.limit("10 per minute")
 def load_more_recipes():
-    """Load the next page of recipes for the current search"""
+    """Navigate recipe pages (next/prev) for the current search and return updated HTML"""
     app.logger.info("Load more recipes route accessed")
     
     # Get current search from session
@@ -512,23 +536,24 @@ def load_more_recipes():
         flash("No active search found. Please search for recipes first.", "warning")
         return redirect(url_for("input_page"))
     
-    # Get next page number
-    next_page = current_search['current_page'] + 1
-    if next_page > current_search['total_pages']:
-        flash("No more recipes available. You've reached the last page.", "info")
-        return redirect(url_for("result_page"))
-    
-    # Update session with new page
-    session['current_search']['current_page'] = next_page
+    # Determine direction and target page
+    direction = (request.form.get('direction') or 'next').lower()
+    cur = int(current_search.get('current_page', 1) or 1)
+    total_pages = int(current_search.get('total_pages', 1) or 1)
+    if direction == 'prev':
+        target_page = max(1, cur - 1)
+    else:
+        target_page = min(total_pages, cur + 1)
+    session['current_search']['current_page'] = target_page
     
     # Get API key
     api_key = os.getenv("SPOONACULAR_API_KEY")
     
     try:
-        app.logger.info(f"Loading page {next_page} for current search")
+        app.logger.info(f"Loading page {target_page} for current search (direction={direction})")
         
-        # Fetch next page of recipes
-        offset = (next_page - 1) * RECIPES_PER_PAGE
+        # Fetch target page of recipes
+        offset = (target_page - 1) * RECIPES_PER_PAGE
         resp = fetch_recipes_by_ingredients_with_offset(
             ",".join(current_search['ingredients']), 
             current_search['dietary_prefs'], 
@@ -560,7 +585,11 @@ def load_more_recipes():
             return redirect(url_for("input_page"))
         
         results = payload.get("results", [])
-        app.logger.info(f"Retrieved {len(results)} recipes for page {next_page}")
+        # Update total pages based on API response if available
+        total_results = payload.get("totalResults") or 0
+        if total_results:
+            session['current_search']['total_pages'] = max(1, math.ceil(total_results / RECIPES_PER_PAGE))
+        app.logger.info(f"Retrieved {len(results)} recipes for page {target_page}")
         
         # Process recipes (same logic as generate route)
         provided_names = {x.lower() for x in current_search['ingredients']}
@@ -692,8 +721,12 @@ def load_more_recipes():
             }
             recipes.append(recipe)
         
-        app.logger.info(f"Successfully processed {len(recipes)} recipes for page {next_page}")
-        return render_template("result.html", recipes=recipes, current_page=next_page, total_pages=current_search['total_pages'])
+        app.logger.info(f"Successfully processed {len(recipes)} recipes for page {target_page}")
+        
+        # Store updated recipes in session
+        session['current_recipes'] = recipes
+        
+        return render_template("result.html", recipes=recipes, current_page=target_page, total_pages=session['current_search']['total_pages'])
         
     except requests.exceptions.Timeout:
         app.logger.error("API request timeout")
@@ -755,4 +788,4 @@ if __name__ == "__main__":
     app.logger.info("Starting Flask Recipe app...")
     app.logger.info(f"API key configured: {os.getenv('SPOONACULAR_API_KEY') is not None}")
     print(f"🔑 API key configured: {os.getenv('SPOONACULAR_API_KEY') is not None}")
-    app.run(debug=Fa)
+    app.run(debug=False)

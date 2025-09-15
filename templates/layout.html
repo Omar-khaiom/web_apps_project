@@ -58,7 +58,8 @@
       }, 1000);
     });
   </script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Serif:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-muji.css') }}">
   
   <script>
     tailwind.config = {
@@ -66,7 +67,7 @@
         extend: {
           fontFamily: {
             'sans': ['Inter', 'system-ui', 'sans-serif'],
-            'heading': ['Poppins', 'system-ui', 'sans-serif'],
+            'heading': ['Noto Serif', 'serif'],
           },
           colors: {
             primary: {
@@ -341,10 +342,10 @@
   </style>
 </head>
 
-<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen font-sans antialiased">
+<body class="min-h-screen font-sans antialiased muji-gradient-bg">
   
   <!-- Navigation with enhanced design -->
-  <nav class="sticky top-0 z-50 glass shadow-xl border-b border-white/30">
+  <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm border-b border-black/5">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-16">
         
@@ -356,19 +357,17 @@
               <i class="fas fa-utensils text-2xl gradient-text"></i>
             </div>
           </div>
-          <span class="text-2xl font-heading font-bold gradient-text group-hover:scale-105 transition-transform duration-300">
-            SmartRecipes
-          </span>
+          <span class="text-2xl font-heading font-bold text-[#1f2937] group-hover:scale-105 transition-transform duration-300">SmartRecipes</span>
         </a>
         
         <!-- Enhanced Navigation Links -->
         <div class="hidden md:flex items-center space-x-6">
-          <a href="/" class="nav-link text-gray-700 hover:text-primary-500 font-medium px-3 py-2 rounded-lg hover:bg-white/50 focus-ring">
+          <a href="/" class="nav-link text-gray-700 hover:text-gray-900 font-medium px-3 py-2 rounded-lg hover:bg-black/5 focus-ring">
             <i class="fas fa-home mr-1 text-sm"></i>
             <span>Home</span>
           </a>
           
-          <a href="/input" class="nav-link text-gray-700 hover:text-primary-500 font-medium px-3 py-2 rounded-lg hover:bg-white/50 focus-ring">
+          <a href="/input" class="nav-link text-gray-700 hover:text-gray-900 font-medium px-3 py-2 rounded-lg hover:bg-black/5 focus-ring">
             <i class="fas fa-search mr-1 text-sm"></i>
             <span>Find Recipes</span>
           </a>
@@ -386,7 +385,7 @@
     </div>
 
     <!-- Enhanced Mobile menu -->
-    <div id="mobile-menu" class="hidden md:hidden glass-dark border-t border-white/20 animate-fade-in-up">
+    <div id="mobile-menu" class="hidden md:hidden bg-white/90 backdrop-blur-md border-t border-black/10 animate-fade-in-up">
       <div class="px-4 py-4 space-y-2">
         <a href="/" class="flex items-center text-gray-700 hover:text-primary-500 font-medium py-3 px-3 rounded-lg hover:bg-white/20 transition-all focus-ring">
           <i class="fas fa-home mr-3"></i>Home

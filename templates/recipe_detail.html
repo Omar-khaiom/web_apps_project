@@ -7,7 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Serif:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-muji.css') }}">
     <!-- Font Awesome from multiple CDNs for reliability -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
@@ -155,7 +156,7 @@
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 via-blue-50 to-purple-100 min-h-screen">
+<body class="min-h-screen muji-gradient-bg">
     <!-- Floating background elements -->
     <div class="fixed inset-0 overflow-hidden pointer-events-none">
         <div class="float absolute top-20 left-10 w-32 h-32 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full blur-3xl"></div>
@@ -166,11 +167,11 @@
     <div class="relative max-w-6xl mx-auto px-4 py-8">
         <!-- Enhanced Header Actions -->
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 print:hidden">
-            <button onclick="history.back()" 
+            <a href="{{ url_for('results') }}" 
                     class="group glass hover-lift text-gray-700 font-semibold py-3 px-6 rounded-xl transition-all duration-300 mb-4 sm:mb-0 flex items-center space-x-2">
                 <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
                 <span>Back to Results</span>
-            </button>
+            </a>
 
             <div class="flex flex-wrap gap-3">
                 {% if session.get('user') %}
