@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Font Awesome Debug Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-icon { font-size: 24px; margin: 10px; padding: 10px; border: 1px solid #ccc; }
+        .debug-info { background: #f0f0f0; padding: 15px; margin: 20px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Font Awesome Debug Test</h1>
+    
+    <h2>Testing Multiple CDN Sources:</h2>
+    
+    <!-- Test 1: CloudFlare CDN -->
+    <div>
+        <h3>CloudFlare CDN:</h3>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+        <i class="fas fa-utensils test-icon" style="color: blue;"></i>
+        <i class="fas fa-search test-icon" style="color: green;"></i>
+        <i class="fas fa-heart test-icon" style="color: red;"></i>
+    </div>
+    
+    <!-- Test 2: Font Awesome Official CDN -->
+    <div>
+        <h3>Font Awesome Official CDN:</h3>
+        <link href="https://use.fontawesome.com/releases/v6.4.0/css/all.css" rel="stylesheet">
+        <i class="fas fa-utensils test-icon" style="color: blue;"></i>
+        <i class="fas fa-search test-icon" style="color: green;"></i>
+        <i class="fas fa-heart test-icon" style="color: red;"></i>
+    </div>
+    
+    <!-- Test 3: jsDelivr CDN -->
+    <div>
+        <h3>jsDelivr CDN:</h3>
+        <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+        <i class="fas fa-utensils test-icon" style="color: blue;"></i>
+        <i class="fas fa-search test-icon" style="color: green;"></i>
+        <i class="fas fa-heart test-icon" style="color: red;"></i>
+    </div>
+    
+    <div class="debug-info" id="debug-output">
+        <h3>Debug Information:</h3>
+        <p>Loading...</p>
+    </div>
+
+    <script>
+        function testFontAwesome() {
+            const debugDiv = document.getElementById('debug-output');
+            let output = '<h3>Debug Information:</h3>';
+            
+            // Test if Font Awesome is loaded
+            const testIcon = document.createElement('i');
+            testIcon.className = 'fas fa-utensils';
+            testIcon.style.position = 'absolute';
+            testIcon.style.left = '-9999px';
+            testIcon.style.visibility = 'hidden';
+            document.body.appendChild(testIcon);
+            
+            const computedStyle = window.getComputedStyle(testIcon, ':before');
+            const content = computedStyle.getPropertyValue('content');
+            const fontFamily = computedStyle.getPropertyValue('font-family');
+            
+            output += `<p><strong>Content:</strong> "${content}"</p>`;
+            output += `<p><strong>Font Family:</strong> "${fontFamily}"</p>`;
+            
+            if (!content || content === 'none' || !fontFamily.includes('Font Awesome')) {
+                output += '<p style="color: red;"><strong>Status:</strong> Font Awesome NOT loaded properly!</p>';
+                output += '<p>Possible issues:</p>';
+                output += '<ul>';
+                output += '<li>Network connectivity issues</li>';
+                output += '<li>CDN blocking or slow response</li>';
+                output += '<li>Content Security Policy blocking external resources</li>';
+                output += '<li>Browser blocking external fonts</li>';
+                output += '</ul>';
+            } else {
+                output += '<p style="color: green;"><strong>Status:</strong> Font Awesome loaded successfully!</p>';
+            }
+            
+            // Test all loaded stylesheets
+            const stylesheets = Array.from(document.styleSheets);
+            output += '<p><strong>Loaded Stylesheets:</strong></p><ul>';
+            stylesheets.forEach((sheet, index) => {
+                try {
+                    const href = sheet.href;
+                    if (href && href.includes('fontawesome')) {
+                        output += `<li style="color: green;">✓ ${href}</li>`;
+                    } else if (href) {
+                        output += `<li>${href}</li>`;
+                    }
+                } catch (e) {
+                    output += `<li>Stylesheet ${index}: Error accessing (CORS)</li>`;
+                }
+            });
+            output += '</ul>';
+            
+            debugDiv.innerHTML = output;
+            document.body.removeChild(testIcon);
+        }
+        
+        // Run test after page loads
+        window.addEventListener('load', testFontAwesome);
+        
+        // Also run after a delay to catch late-loading resources
+        setTimeout(testFontAwesome, 2000);
+    </script>
+</body>
+</html>

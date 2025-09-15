@@ -8,7 +8,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Font Awesome from multiple CDNs for reliability -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    
+    <!-- Fallback Font Awesome CDN -->
+    <link href="https://use.fontawesome.com/releases/v6.4.0/css/all.css" rel="stylesheet" crossorigin="anonymous">
     <style>
         * { font-family: 'Inter', sans-serif; }
         .font-heading { font-family: 'Poppins', sans-serif; }
@@ -312,7 +318,13 @@
             <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mb-6">
                 <div class="flex items-center space-x-3">
                     <i class="fas fa-magic text-purple-500 text-xl"></i>
-                    <span class="text-lg font-semibold text-gray-700">Want more recipes?</span>
+                    <span class="text-lg font-semibold text-gray-700">
+                        {% if current_page and total_pages %}
+                        Page {{ current_page }} of {{ total_pages }}
+                        {% else %}
+                        Want more recipes?
+                        {% endif %}
+                    </span>
                 </div>
                 <div class="flex gap-3">
                     <button onclick="refreshRecipes()" 
@@ -320,16 +332,36 @@
                         <i class="fas fa-sync-alt group-hover:animate-spin"></i>
                         <span>Get Fresh Recipes</span>
                     </button>
+                    {% if current_page and total_pages and current_page < total_pages %}
                     <button onclick="loadMoreRecipes()" 
+                            id="load-more-btn"
                             class="group bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex items-center justify-center space-x-2">
                         <i class="fas fa-plus-circle group-hover:animate-bounce"></i>
                         <span>Load More Recipes</span>
                     </button>
+                    {% elif current_page and total_pages and current_page >= total_pages %}
+                    <button disabled
+                            class="group bg-gray-400 text-white font-bold py-3 px-6 rounded-xl flex items-center justify-center space-x-2 cursor-not-allowed">
+                        <i class="fas fa-check-circle"></i>
+                        <span>All Recipes Loaded</span>
+                    </button>
+                    {% else %}
+                    <button onclick="loadMoreRecipes()" 
+                            id="load-more-btn"
+                            class="group bg-gradient-to-r from-teal-500 to-cyan-500 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1 flex items-center justify-center space-x-2">
+                        <i class="fas fa-plus-circle group-hover:animate-bounce"></i>
+                        <span>Load More Recipes</span>
+                    </button>
+                    {% endif %}
                 </div>
             </div>
             <p class="text-sm text-gray-600 mb-4">
                 <i class="fas fa-lightbulb text-yellow-500 mr-1"></i>
+                {% if current_page and current_page > 1 %}
+                Showing page {{ current_page }} of recipes with the same ingredients!
+                {% else %}
                 Each refresh shows different recipes with the same ingredients!
+                {% endif %}
             </p>
         </div>
         
@@ -483,18 +515,116 @@
             img.style.transition = 'opacity 0.3s ease';
         });
 
-        // Simplified pagination functionality
+        // Enhanced pagination functionality
         function refreshRecipes() {
             // Simply redirect back to search page
             window.location.href = '{{ url_for("input_page") }}';
         }
 
-        function loadMoreRecipes() {
-            // For now, just redirect back to search page
-            showToast('Please search again to get more recipes!', 'info');
-            setTimeout(() => {
-                window.location.href = '{{ url_for("input_page") }}';
-            }, 2000);
+        async function loadMoreRecipes() {
+            const button = document.getElementById('load-more-btn');
+            if (!button) return;
+            
+            const originalContent = button.innerHTML;
+            
+            // Show loading state
+            button.innerHTML = `
+                <div class="flex items-center space-x-2">
+                    <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <span>Loading More Recipes...</span>
+                </div>
+            `;
+            button.disabled = true;
+            button.classList.add('opacity-75');
+            
+            try {
+                const response = await fetch('/load-more-recipes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'load_more=true'
+                });
+                
+                if (response.ok) {
+                    // Get the new HTML content
+                    const newContent = await response.text();
+                    
+                    // Create a temporary div to parse the new content
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = newContent;
+                    
+                    // Find the recipe grid in the new content
+                    const newRecipeGrid = tempDiv.querySelector('#recipe-grid');
+                    const newPaginationControls = tempDiv.querySelector('.text-center.glass.rounded-2xl.p-6.mb-8.shadow-lg.print\\:hidden');
+                    
+                    if (newRecipeGrid) {
+                        // Replace the current recipe grid with the new one
+                        const currentGrid = document.getElementById('recipe-grid');
+                        currentGrid.innerHTML = newRecipeGrid.innerHTML;
+                        
+                        // Update pagination controls
+                        if (newPaginationControls) {
+                            const currentPagination = document.querySelector('.text-center.glass.rounded-2xl.p-6.mb-8.shadow-lg.print\\:hidden');
+                            if (currentPagination) {
+                                currentPagination.outerHTML = newPaginationControls.outerHTML;
+                            }
+                        }
+                        
+                        // Scroll to top of recipes
+                        currentGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        
+                        // Show success message
+                        showToast('More recipes loaded successfully!', 'success');
+                        
+                        // Re-attach event listeners to new buttons
+                        attachEventListeners();
+                    } else {
+                        throw new Error('No recipes found in response');
+                    }
+                } else {
+                    const errorData = await response.text();
+                    console.error('Error loading more recipes:', errorData);
+                    showToast('Error loading more recipes. Please try again.', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading more recipes:', error);
+                showToast('Error loading more recipes. Please try again.', 'error');
+            } finally {
+                // Restore button state
+                button.innerHTML = originalContent;
+                button.disabled = false;
+                button.classList.remove('opacity-75');
+            }
+        }
+        
+        // Function to re-attach event listeners after content update
+        function attachEventListeners() {
+            // Re-attach load more button listener
+            const loadMoreBtn = document.getElementById('load-more-btn');
+            if (loadMoreBtn) {
+                loadMoreBtn.onclick = loadMoreRecipes;
+            }
+            
+            // Re-attach filter and sort listeners
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Update active button
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const filter = this.dataset.filter;
+                    filterRecipes(filter);
+                });
+            });
+            
+            const sortSelect = document.getElementById('sort-select');
+            if (sortSelect) {
+                sortSelect.addEventListener('change', function() {
+                    sortRecipes(this.value);
+                });
+            }
         }
     </script>
 </body>

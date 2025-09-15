@@ -7,7 +7,7 @@
 <section class="relative min-h-screen flex items-center justify-center overflow-hidden">
   <!-- Background Image with Overlay -->
   <div class="absolute inset-0 z-0">
-    <img class="w-full h-full object-cover" src="{{ url_for('static', filename='images/kitchen-bg.jpg') }}" alt="Kitchen Background">
+    <img class="w-full h-full object-cover" src="{{ url_for('static', filename='images/landing-page.jpg') }}" alt="Kitchen Background">
     <div class="absolute inset-0 bg-gradient-to-br from-primary-900/80 via-orange-900/70 to-yellow-900/60"></div>
   </div>
   
@@ -74,7 +74,7 @@
             <label class="dietary-option group cursor-pointer">
               <input type="checkbox" name="diet" value="vegetarian" class="hidden">
               <div class="glass-card rounded-xl p-4 text-center hover:scale-105 transition-all duration-300 border-2 border-transparent">
-                <div class="text-3xl mb-2 group-hover:animate-bounce-gentle">🥬</div>
+                <div class="text-3xl mb-2 group-hover:animate-bounce-gentle"><i class="fas fa-leaf text-green-400"></i></div>
                 <span class="text-white font-medium">Vegetarian</span>
               </div>
             </label>
@@ -82,7 +82,7 @@
             <label class="dietary-option group cursor-pointer">
               <input type="checkbox" name="diet" value="vegan" class="hidden">
               <div class="glass-card rounded-xl p-4 text-center hover:scale-105 transition-all duration-300 border-2 border-transparent">
-                <div class="text-3xl mb-2 group-hover:animate-bounce-gentle">🌱</div>
+                <div class="text-3xl mb-2 group-hover:animate-bounce-gentle"><i class="fas fa-seedling text-green-300"></i></div>
                 <span class="text-white font-medium">Vegan</span>
               </div>
             </label>
@@ -90,7 +90,7 @@
             <label class="dietary-option group cursor-pointer">
               <input type="checkbox" name="diet" value="gluten free" class="hidden">
               <div class="glass-card rounded-xl p-4 text-center hover:scale-105 transition-all duration-300 border-2 border-transparent">
-                <div class="text-3xl mb-2 group-hover:animate-bounce-gentle">🌾</div>
+                <div class="text-3xl mb-2 group-hover:animate-bounce-gentle"><i class="fas fa-wheat text-yellow-400"></i></div>
                 <span class="text-white font-medium">Gluten Free</span>
               </div>
             </label>
@@ -98,7 +98,7 @@
             <label class="dietary-option group cursor-pointer">
               <input type="checkbox" name="diet" value="dairy free" class="hidden">
               <div class="glass-card rounded-xl p-4 text-center hover:scale-105 transition-all duration-300 border-2 border-transparent">
-                <div class="text-3xl mb-2 group-hover:animate-bounce-gentle">🥛</div>
+                <div class="text-3xl mb-2 group-hover:animate-bounce-gentle"><i class="fas fa-ban text-red-400"></i></div>
                 <span class="text-white font-medium">Dairy Free</span>
               </div>
             </label>
@@ -106,7 +106,7 @@
             <label class="dietary-option group cursor-pointer">
               <input type="checkbox" name="diet" value="keto" class="hidden">
               <div class="glass-card rounded-xl p-4 text-center hover:scale-105 transition-all duration-300 border-2 border-transparent">
-                <div class="text-3xl mb-2 group-hover:animate-bounce-gentle">🥑</div>
+                <div class="text-3xl mb-2 group-hover:animate-bounce-gentle"><i class="fas fa-egg text-green-500"></i></div>
                 <span class="text-white font-medium">Keto</span>
               </div>
             </label>
@@ -114,7 +114,7 @@
             <label class="dietary-option group cursor-pointer">
               <input type="checkbox" name="diet" value="paleo" class="hidden">
               <div class="glass-card rounded-xl p-4 text-center hover:scale-105 transition-all duration-300 border-2 border-transparent">
-                <div class="text-3xl mb-2 group-hover:animate-bounce-gentle">🥩</div>
+                <div class="text-3xl mb-2 group-hover:animate-bounce-gentle"><i class="fas fa-drumstick-bite text-orange-500"></i></div>
                 <span class="text-white font-medium">Paleo</span>
               </div>
             </label>
@@ -122,7 +122,7 @@
             <label class="dietary-option group cursor-pointer">
               <input type="checkbox" name="diet" value="low carb" class="hidden">
               <div class="glass-card rounded-xl p-4 text-center hover:scale-105 transition-all duration-300 border-2 border-transparent">
-                <div class="text-3xl mb-2 group-hover:animate-bounce-gentle">🥒</div>
+                <div class="text-3xl mb-2 group-hover:animate-bounce-gentle"><i class="fas fa-carrot text-green-400"></i></div>
                 <span class="text-white font-medium">Low Carb</span>
               </div>
             </label>
@@ -130,7 +130,7 @@
             <label class="dietary-option group cursor-pointer">
               <input type="checkbox" name="diet" value="whole30" class="hidden">
               <div class="glass-card rounded-xl p-4 text-center hover:scale-105 transition-all duration-300 border-2 border-transparent">
-                <div class="text-3xl mb-2 group-hover:animate-bounce-gentle">💪</div>
+                <div class="text-3xl mb-2 group-hover:animate-bounce-gentle"><i class="fas fa-dumbbell text-blue-500"></i></div>
                 <span class="text-white font-medium">Whole30</span>
               </div>
             </label>

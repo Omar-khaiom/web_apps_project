@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icon Test - SmartRecipes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome from multiple CDNs for reliability -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    
+    <!-- Fallback Font Awesome CDN -->
+    <link href="https://use.fontawesome.com/releases/v6.4.0/css/all.css" rel="stylesheet" crossorigin="anonymous">
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8 text-center">Font Awesome Icon Test</h1>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-4 rounded-lg shadow text-center">
+                <i class="fas fa-utensils text-4xl text-blue-500 mb-2"></i>
+                <p class="text-sm">fa-utensils</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow text-center">
+                <i class="fas fa-search text-4xl text-green-500 mb-2"></i>
+                <p class="text-sm">fa-search</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow text-center">
+                <i class="fas fa-heart text-4xl text-red-500 mb-2"></i>
+                <p class="text-sm">fa-heart</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow text-center">
+                <i class="fas fa-leaf text-4xl text-green-600 mb-2"></i>
+                <p class="text-sm">fa-leaf</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow text-center">
+                <i class="fas fa-clock text-4xl text-orange-500 mb-2"></i>
+                <p class="text-sm">fa-clock</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow text-center">
+                <i class="fas fa-users text-4xl text-purple-500 mb-2"></i>
+                <p class="text-sm">fa-users</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow text-center">
+                <i class="fas fa-star text-4xl text-yellow-500 mb-2"></i>
+                <p class="text-sm">fa-star</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow text-center">
+                <i class="fas fa-home text-4xl text-indigo-500 mb-2"></i>
+                <p class="text-sm">fa-home</p>
+            </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-xl font-bold mb-4">Debug Information</h2>
+            <div id="debug-info" class="text-sm text-gray-600">
+                <p>Checking Font Awesome loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Checking Font Awesome loading...');
+            
+            const debugDiv = document.getElementById('debug-info');
+            
+            // Test if Font Awesome is loaded
+            const testIcon = document.createElement('i');
+            testIcon.className = 'fas fa-utensils';
+            testIcon.style.position = 'absolute';
+            testIcon.style.left = '-9999px';
+            testIcon.style.visibility = 'hidden';
+            document.body.appendChild(testIcon);
+            
+            setTimeout(() => {
+                const computedStyle = window.getComputedStyle(testIcon, ':before');
+                const content = computedStyle.getPropertyValue('content');
+                const fontFamily = computedStyle.getPropertyValue('font-family');
+                
+                console.log('Font Awesome test - Content:', content);
+                console.log('Font Awesome test - Font Family:', fontFamily);
+                
+                let debugInfo = `
+                    <p><strong>Content:</strong> ${content}</p>
+                    <p><strong>Font Family:</strong> ${fontFamily}</p>
+                `;
+                
+                if (!content || content === 'none' || !fontFamily.includes('Font Awesome')) {
+                    debugInfo += '<p class="text-red-600"><strong>Status:</strong> Font Awesome NOT loaded properly!</p>';
+                    console.warn('Font Awesome not loaded properly!');
+                } else {
+                    debugInfo += '<p class="text-green-600"><strong>Status:</strong> Font Awesome loaded successfully!</p>';
+                    console.log('Font Awesome loaded successfully!');
+                }
+                
+                debugDiv.innerHTML = debugInfo;
+                document.body.removeChild(testIcon);
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
